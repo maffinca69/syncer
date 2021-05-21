@@ -10,7 +10,7 @@ use App\Services\AuthService;
 use Illuminate\Console\Command;
 use function Symfony\Component\String\s;
 
-class RefreshUserTokens  extends Command
+class RefreshUserTokensCommand  extends Command
 {
     /**
      * The name and signature of the console command.

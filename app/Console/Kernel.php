@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\CheckHasNewTrackCommand;
+use App\Console\Commands\RefreshUserTokensCommand;
 use App\Jobs\RefreshTokenJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
@@ -16,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         CheckHasNewTrackCommand::class,
-        RefreshTokenJob::class,
+        RefreshUserTokensCommand::class,
     ];
 
     /**
