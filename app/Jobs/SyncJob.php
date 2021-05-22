@@ -46,6 +46,10 @@ class SyncJob extends Job implements ShouldQueue
 
         [$add, $remove, $nextUrl] = $playlistService->checkTracks($user, $next);
 
+        $existsTrack = $user->getSongsUris();
+        $add = array_diff($add, $existsTrack);
+        $remove = array_intersect($existsTrack,$remove);
+
         Log::info('Count new tracks - ' . count($add));
         Log::info('Count remove tracks - ' . count($remove));
 

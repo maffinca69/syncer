@@ -47,8 +47,23 @@ class User extends Model
      */
     public function getSongsUris(): array
     {
+        return $this->getSongsUrisBuilder()->toArray();
+    }
+
+    private function getSongsUrisBuilder()
+    {
         return $this->songs->reverse()->map(function (Song $song) {
             return $song->uri;
-        })->take(PlaylistService::LIMIT_GET_SAVED_SONGS)->toArray();
+        });
+    }
+
+    /**
+     * Return array uris
+     *
+     * @return array
+     */
+    public function getSongsUrisWithLimit(): array
+    {
+        return $this->getSongsUrisBuilder()->take(PlaylistService::LIMIT_GET_SAVED_SONGS)->toArray();
     }
 }

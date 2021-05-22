@@ -119,7 +119,7 @@ class PlaylistService
     public function checkTracks(User $user, $next = null): array
     {
         [$songs, $next] = $this->getFavoritesSongs($user, $next);
-        $favoritesTracks = $user->getSongsUris();
+        $favoritesTracks = $user->getSongsUrisWithLimit();
 
         $add = $this->diffAddedTracks($songs, $favoritesTracks);
         $remove = $this->diffDeletedTracks($songs, $favoritesTracks);
