@@ -66,11 +66,11 @@ class AuthService
 
     private function saveAccessToken(string $refresh, string $access): bool
     {
-        if (Cache::has($access)) {
-            Cache::forget($access);
+        if (Cache::has($refresh)) {
+            Cache::forget($refresh);
         }
 
-        return Cache::put($access, $refresh);
+        return Cache::put($refresh, $access);
     }
 
     /**

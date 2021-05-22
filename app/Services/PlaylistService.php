@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PlaylistService
 {
@@ -83,6 +84,8 @@ class PlaylistService
 
             array_push($newSongs, $songUri);
         }
+
+        Log::info('count new songs - ' . count($newSongs));
 
         $user->update(['last_song_id' => current($songs)]);
 
