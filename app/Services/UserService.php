@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class UserService
 {
@@ -35,9 +34,10 @@ class UserService
      */
     public function saveUserInfo(string $token, array $data): Model
     {
-        return User::firstOrCreate(['info' => $data], [
+        return User::query()->updateOrCreate(['spotify_id' => $data['id']], [
             'refresh_token' => $token,
-            'info' => $data
+            'info' => $data,
+            'spotify_id' => $data['id']
         ]);
     }
 }

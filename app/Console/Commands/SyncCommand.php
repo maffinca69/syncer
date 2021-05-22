@@ -4,18 +4,18 @@
 namespace App\Console\Commands;
 
 
-use App\Jobs\CheckNewFavoriteTracksJob;
+use App\Jobs\SyncJob;
 use App\Models\User;
 use Illuminate\Console\Command;
 
-class CheckHasNewTrackCommand extends Command
+class SyncCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'check:tracks';
+    protected $signature = 'sync:tracks';
 
     /**
      * The console command description.
@@ -45,7 +45,7 @@ class CheckHasNewTrackCommand extends Command
         $users = User::all();
         foreach ($users as $user) {
             $this->info('Начало проверки плейлиста - ' . $user->playlist_id);
-            dispatch(new CheckNewFavoriteTracksJob($user->refresh_token));
+            dispatch(new SyncJob($user->refresh_token));
         }
 
         $this->info('Проверка закончена');

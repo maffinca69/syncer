@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PlaylistService;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -16,6 +17,7 @@ use Laravel\Lumen\Auth\Authorizable;
  * @property string refresh_token
  * @property string playlist_id
  * @property string last_song_id
+ * @property Song[] songs
  * @property array info
  */
 class User extends Model
@@ -30,15 +32,23 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'refresh_token', 'info', 'playlist_id', 'last_song_id'
+        'refresh_token', 'info', 'playlist_id', 'last_song_id', 'spotify_id'
     ];
 
+    public function songs()
+    {
+        return $this->hasMany(Song::class);
+    }
+
     /**
-     * The attributes excluded from the model's JSON form.
+     * Return array uris
      *
-     * @var array
+     * @return array
      */
-    protected $hidden = [
-        'password',
-    ];
+    public function getSongsUris(): array
+    {
+        return $this->songs->reverse()->map(function (Song $song) {
+            return $song->uri;
+        })->take(PlaylistService::LIMIT_GET_SAVED_SONGS)->toArray();
+    }
 }

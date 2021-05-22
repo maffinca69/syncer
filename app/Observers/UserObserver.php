@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Jobs\CheckNewFavoriteTracksJob;
+use App\Jobs\SyncJob;
 use App\Models\User;
 use App\Services\PlaylistService;
 use Illuminate\Support\Facades\Log;
@@ -24,12 +24,19 @@ class UserObserver
      */
     public function created(User $user)
     {
-       $playlistId = $this->playlistService->createNewPublicPlaylist($user);
+        $this->createPlaylist($user);
+    }
+
+
+    private function createPlaylist(User $user)
+    {
+        Log::info('ccreate plalist');
+        $playlistId = $this->playlistService->createNewPublicPlaylist($user);
 
         if ($playlistId) {
-           $user->update(['playlist_id' => $playlistId]);
-           dispatch(new CheckNewFavoriteTracksJob($user->refresh_token));
-       }
+            $user->update(['playlist_id' => $playlistId]);
+            dispatch(new SyncJob($user->refresh_token));
+        }
     }
 
     /**
@@ -40,7 +47,7 @@ class UserObserver
      */
     public function updated(User $user)
     {
-        //
+//        $this->createPlaylist($user);
     }
 
     /**

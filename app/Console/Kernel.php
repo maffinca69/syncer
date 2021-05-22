@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Console\Commands\CheckHasNewTrackCommand;
+use App\Console\Commands\SyncCommand;
 use App\Console\Commands\RefreshUserTokensCommand;
 use App\Jobs\RefreshTokenJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        CheckHasNewTrackCommand::class,
+        SyncCommand::class,
         RefreshUserTokensCommand::class,
     ];
 
@@ -28,6 +28,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('check:tracks')->everyMinute();
+        $schedule->command('sync:tracks')->everyMinute();
     }
 }

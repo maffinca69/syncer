@@ -4,7 +4,7 @@
 namespace App\Console\Commands;
 
 
-use App\Jobs\CheckNewFavoriteTracksJob;
+use App\Jobs\SyncJob;
 use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Console\Command;

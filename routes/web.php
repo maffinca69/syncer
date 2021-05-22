@@ -16,7 +16,6 @@
 use Illuminate\Support\Facades\Cache;
 
 $router->get('/', function () use ($router) {
-//    dd(Cache::has('AQDBuP_yy7VKC-BMskOFlErmjzeQG7S_D5YaF-Dzt7EEKsWRbWgUx93IhNmTpil_Ay-N6zTEcXTVOyHuU1M-Uk7GPBh2j7sC2rBcXYgLnCXcwrlFYkf6bcWaXcSYHgI4csQ'));
     return view('login');
 });
 
