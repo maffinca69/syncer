@@ -5,7 +5,7 @@ services:
     tty: true
     working_dir: /var/www/syncer
     volumes:
-      - ../.:/var/www/syncer:cached
+      - ../.:/var/www/syncer:default
       - ./fpm/config/php.ini-local:/usr/local/etc/php/php.ini:ro
 
   nginx:
@@ -14,8 +14,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ../.:/var/www/syncer:cached
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:delegated
+      - ../.:/var/www/syncer:default
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:default
 
   mysql:
     platform: linux/x86_64

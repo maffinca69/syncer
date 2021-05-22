@@ -45,7 +45,7 @@ class SyncCommand extends Command
         $users = User::all();
         foreach ($users as $user) {
             $this->info('Начало проверки плейлиста - ' . $user->playlist_id);
-            dispatch(new SyncJob($user->refresh_token));
+            dispatch(new SyncJob($user->refresh_token, false));
         }
 
         $this->info('Проверка закончена');

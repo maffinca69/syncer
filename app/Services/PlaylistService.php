@@ -14,9 +14,6 @@ class PlaylistService
     const FAVORITE_PLAYLIST_DESCRIPTION = 'My favorite songs';
     const LIMIT_GET_SAVED_SONGS = 50;
 
-    const START_CHECKED_POSITION_INDEX = 0;
-    const END_CHECKED_POSITION_INDEX = self::LIMIT_GET_SAVED_SONGS - 10;
-
     public function createNewPublicPlaylist(User $user): string
     {
         $accessToken = AuthService::getAccessToken($user->refresh_token);
@@ -28,7 +25,6 @@ class PlaylistService
             'description' => self::FAVORITE_PLAYLIST_DESCRIPTION,
             'public' => true
         ]);
-        Log::info($response);
 
         $data = $response->json();
         return $data['id'] ?? '';
@@ -42,11 +38,8 @@ class PlaylistService
     public function getFavoritesSongs(User $user, $next = null): array
     {
         $accessToken = AuthService::getAccessToken($user->refresh_token);
-        Log::info($accessToken);
         $baseUrl = 'https://api.spotify.com/v1/me/tracks?limit=' . self::LIMIT_GET_SAVED_SONGS;
-        Log::info($baseUrl);
-        $response = Http::withToken($accessToken)
-            ->get($next ?? $baseUrl);
+        $response = Http::withToken($accessToken)->get($next ?? $baseUrl);
         $responseArray = $response->json();
 
         $list = $this->prepareListFavoriteSongs($responseArray);
@@ -92,9 +85,6 @@ class PlaylistService
             'tracks' => $this->prepareUriSongsForDelete($songsUris),
         ]);
 
-        Log::info('remove');
-        Log::info($response);
-
         return $response->json();
     }
 
@@ -114,20 +104,21 @@ class PlaylistService
     /**
      * @param User $user
      * @param null $next
+     * @param bool $syncAll
      * @return array
      */
-    public function checkTracks(User $user, $next = null): array
+    public function checkTracks(User $user, $next = null, $syncAll = false): array
     {
         [$songs, $next] = $this->getFavoritesSongs($user, $next);
         $favoritesTracks = $user->getSongsUrisWithLimit();
+        Log::info('api');
+        Log::info($songs);
+        Log::info('database');
+        Log::info($favoritesTracks);
 
-        $add = $this->diffAddedTracks($songs, $favoritesTracks);
-        $remove = $this->diffDeletedTracks($songs, $favoritesTracks);
+        $list = $this->diffTracks($songs, $favoritesTracks, $syncAll);
 
-        Log::info('count add songs - ' . count($add));
-        Log::info('count remove songs - ' . count($remove));
-
-        return [$add, $remove, $next];
+        return [$list, $next];
     }
 
     /**
@@ -135,22 +126,11 @@ class PlaylistService
      *
      * @param array $savedTracks - saved users tracks
      * @param array $favoritesTracks - tracks in public favorites playlist
+     * @param bool $syncAll
      * @return array
      */
-    private function diffAddedTracks(array $savedTracks, array $favoritesTracks): array
+    private function diffTracks(array $savedTracks, array $favoritesTracks, $syncAll = false): array
     {
-        return array_values(array_diff($savedTracks, $favoritesTracks));
-    }
-
-    /**
-     * Return array of deleted tracks
-     *
-     * @param array $savedTracks - saved users tracks (api)
-     * @param array $favoritesTracks - tracks in public favorites playlist (database)
-     * @return array
-     */
-    private function diffDeletedTracks(array $savedTracks, array $favoritesTracks): array
-    {
-        return array_values(array_diff($favoritesTracks, $savedTracks));
+        return array_values(array_diff($savedTracks, $favoritesTracks, ));
     }
 }

@@ -35,7 +35,7 @@ class UserObserver
 
         if ($playlistId) {
             $user->update(['playlist_id' => $playlistId]);
-            dispatch(new SyncJob($user->refresh_token));
+            dispatch(new SyncJob($user->refresh_token, true));
         }
     }
 

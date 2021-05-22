@@ -43,11 +43,11 @@ class AuthService
 
         $resData = $response->json();
 
+        Log::info($resData);
+
         $accessToken = $resData['access_token'];
         $refreshToken = $resData['refresh_token'];
-        if ($this->saveAccessToken($accessToken, $refreshToken)) {
-            Log::info('refresh - ' . $refreshToken);
-            Log::info('access - ' . $accessToken);
+        if ($this->saveAccessToken($refreshToken, $accessToken)) {
             $this->sendToQueue($refreshToken, $resData['expires_in']);
             return [$refreshToken, $accessToken];
         }
@@ -66,19 +66,7 @@ class AuthService
 
     private function saveAccessToken(string $refresh, string $access): bool
     {
-//        if (Cache::has($refresh)) {
-//            Cache::forget($refresh);
-//        }
-//
-//        return Cache::put($refresh, $access);
-
-        if (Cache::has($access)) {
-            Cache::forget($access);
-        }
-
-        return Cache::put($access, $refresh);
-
-
+        return Cache::put($refresh, $access);
     }
 
     /**
@@ -96,8 +84,6 @@ class AuthService
             'grant_type' => 'refresh_token',
             'refresh_token' => $token,
         ]);
-
-        Log::info($response);
 
         $resData = $response->json();
 

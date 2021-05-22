@@ -19,14 +19,18 @@ class SyncJob extends Job implements ShouldQueue
 
     private $service;
 
+    private $syncAll;
+
     /**
      * Create a new job instance.
      *
      * @param string $token
+     * @param bool $syncAll
      */
-    public function __construct(string $token)
+    public function __construct(string $token, $syncAll = false)
     {
         $this->token = $token;
+        $this->syncAll = $syncAll;
     }
 
     /**
@@ -44,31 +48,50 @@ class SyncJob extends Job implements ShouldQueue
             return;
         }
 
-        [$add, $remove, $nextUrl] = $playlistService->checkTracks($user, $next);
+        [$list, $nextUrl] = $playlistService->checkTracks($user, $next, $this->syncAll);
 
-        $existsTrack = $user->getSongsUris();
-        $add = array_diff($add, $existsTrack);
-        $remove = array_intersect($existsTrack,$remove);
+        $add = [];
+        $remove = [];
+        Log::info($list);
+        // todo: REFACTORING!!!
+        if (!$this->syncAll) {
+            // fuck fuck fuck
+            foreach ($list as $uri) {
+                $song = Song::query()->where('uri', $uri)->exists();
+                if ($song) {
+                    $this->removeSong([$uri]);
+                    array_push($remove, $uri);
+                } else {
+                    Song::query()->create(['uri' => $uri, 'user_id' => $user->id]);
+                    array_push($add, $uri);
+                }
+            }
 
-        Log::info('Count new tracks - ' . count($add));
-        Log::info('Count remove tracks - ' . count($remove));
+            if ($add) {
+                $playlistService->addSongsToPlaylist($user, $add, $user->playlist_id, 0);
+            }
 
-        if ($add) {
-            $position = !$next ? 0 : count($add) - 1;
-            $playlistService->addSongsToPlaylist($user, $add, $user->playlist_id, $position);
-            $this->addSong($user, $add);
-        }
+            if ($remove) {
+                $playlistService->removeSongsFromPlaylist($user, $remove, $user->playlist_id);
+            }
+        } else {
+            $add = $list;
+            if ($add) {
+                $position = !$next ? 0 : count($add) - 1;
+                $this->addSong($user,$add);
+                $playlistService->addSongsToPlaylist($user, $add, $user->playlist_id, $position);
+            }
 
-        if ($remove && (!$next && !$nextUrl)) {
-            $playlistService->removeSongsFromPlaylist($user, $remove, $user->playlist_id);
-            $this->removeSong($remove);
-        }
-
-        if ($nextUrl) {
-            $this->handle($playlistService, $nextUrl);
+            if ($nextUrl) {
+                $this->handle($playlistService, $nextUrl);
+            }
         }
     }
 
+    /**
+     * @param array $songs
+     * @return mixed
+     */
     private function removeSong(array $songs)
     {
         return Song::query()->whereIn('uri', $songs)->delete();

@@ -52,7 +52,7 @@ class User extends Model
 
     private function getSongsUrisBuilder()
     {
-        return $this->songs->reverse()->map(function (Song $song) {
+        return $this->songs->map(function (Song $song) {
             return $song->uri;
         });
     }
