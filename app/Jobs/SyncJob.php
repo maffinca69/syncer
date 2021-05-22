@@ -57,9 +57,11 @@ class SyncJob extends Job implements ShouldQueue
         if (!$this->syncAll) {
             // fuck fuck fuck
             foreach ($list as $uri) {
-                $song = Song::query()->where('uri', $uri)->exists();
+                $song = Song::query()
+                    ->where('user_id', $user->id)
+                    ->where('uri', $uri)->exists();
                 if ($song) {
-                    $this->removeSong([$uri]);
+                    $this->removeSong($user,[$uri]);
                     array_push($remove, $uri);
                 } else {
                     Song::query()->create(['uri' => $uri, 'user_id' => $user->id]);
@@ -89,21 +91,22 @@ class SyncJob extends Job implements ShouldQueue
     }
 
     /**
+     * @param User $user
      * @param array $songs
      * @return mixed
      */
-    private function removeSong(array $songs)
+    private function removeSong(User $user, array $songs)
     {
-        return Song::query()->whereIn('uri', $songs)->delete();
+        return Song::query()
+            ->where('user_id', $user->id)
+            ->whereIn('uri', $songs)->delete();
     }
 
     private function addSong(User $user, array $songs)
     {
         foreach ($songs as $song) {
-            Song::query()->firstOrCreate(['uri' => $song], [
-                'uri' => $song,
-                'user_id' => $user->id
-            ]);
+            $data = ['uri' => $song, 'user_id' => $user->id];
+            Song::query()->firstOrCreate($data, $data);
         }
     }
 
