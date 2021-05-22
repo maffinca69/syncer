@@ -1,14 +1,3 @@
-{{--@php--}}
-{{--    $saved = [5,6,10,9,8,];--}}
-{{--    $favorites = [10,9,8,7];--}}
-
-{{--    $add = array_values(array_diff($saved, $favorites));--}}
-{{--    $remove = array_values(array_diff($favorites, $saved));--}}
-
-{{--    $exists = [5,7];--}}
-
-{{--    dd($add, $remove, array_diff($add, $exists), array_intersect($exists, $remove));--}}
-{{--@endphp--}}
 <html>
     <head>
         <link rel="https://cdn.rawgit.com/mfd/f3d96ec7f0e8f034cc22ea73b3797b59/raw/856f1dbb8d807aabceb80b6d4f94b464df461b3e/gotham.css">

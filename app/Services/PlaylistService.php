@@ -151,11 +151,6 @@ class PlaylistService
      */
     private function diffDeletedTracks(array $savedTracks, array $favoritesTracks): array
     {
-        /*
-         * When the user deletes a track, the last received track becomes a new one, because the position is shifted.
-         * To fix it, we request 50 tracks and look at the last 40, thus assuming that only 10 tracks can be deleted from the last update
-         */
-//        $savedTracks = array_slice(array_reverse($savedTracks), self::START_CHECKED_POSITION_INDEX, self::END_CHECKED_POSITION_INDEX);
         return array_values(array_diff($favoritesTracks, $savedTracks));
     }
 }
