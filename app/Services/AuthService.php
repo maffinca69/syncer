@@ -89,9 +89,12 @@ class AuthService
             'refresh_token' => $token,
         ]);
 
+        Log::info($response);
+
         $resData = $response->json();
 
         if ($this->saveAccessToken($token, $resData['access_token'])) {
+            Log::info(self::getAccessToken($token));
             $this->sendToQueue($token, $resData['expires_in']);
         }
     }
